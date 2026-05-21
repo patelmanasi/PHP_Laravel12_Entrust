@@ -223,8 +223,7 @@
                     Trash Users
                 </h1>
 
-                <a href="{{ route('users.index') }}"
-                    class="btn btn-custom btn-back">
+                <a href="{{ route('users.index') }}" class="btn btn-custom btn-back">
 
                     Back To Users
 
@@ -291,8 +290,7 @@
                                     <div class="d-flex justify-content-center gap-2 action-buttons">
 
                                         {{-- Restore --}}
-                                        <form method="POST"
-                                            action="{{ route('users.restore', $user->id) }}">
+                                        <form method="POST" action="{{ route('users.restore', $user->id) }}">
 
                                             @csrf
                                             @method('PATCH')
@@ -306,8 +304,7 @@
                                         </form>
 
                                         {{-- Permanent Delete --}}
-                                        <form method="POST"
-                                            action="{{ route('users.forceDelete', $user->id) }}">
+                                        <form method="POST" action="{{ route('users.forceDelete', $user->id) }}">
 
                                             @csrf
                                             @method('DELETE')
