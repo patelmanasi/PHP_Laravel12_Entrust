@@ -10,65 +10,131 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth'); // Only logged-in users
+        // Only authenticated users can access
+        $this->middleware('auth');
     }
 
-    // List users + search
+    /**
+     * Display users with search
+     */
     public function index(Request $request)
     {
         $query = User::query();
 
+        // Search by name or email
         if ($request->filled('search')) {
+
             $search = $request->search;
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
         }
 
-        $users = $query->paginate(10);
+        $users = $query->latest()->paginate(4);
 
         return view('users.index', compact('users'));
     }
 
-    // Toggle status
+    /**
+     * Toggle user status
+     */
     public function toggleStatus($id)
     {
         $user = User::findOrFail($id);
+
         $user->status = !$user->status;
+
         $user->save();
 
-        return back()->with('success', 'User status updated!');
+        return back()->with('success', 'User status updated successfully!');
     }
 
-    // Soft delete user
+    /**
+     * Soft delete user
+     */
     public function destroy($id)
     {
+        // Prevent deleting own account
         if (auth()->id() == $id) {
             return back()->with('error', 'You cannot delete your own account!');
         }
 
         $user = User::findOrFail($id);
+
         $user->delete();
 
-        return back()->with('success', 'User deleted!');
+        return back()->with('success', 'User moved to trash successfully!');
     }
 
-    // Export CSV
+    /**
+     * Show trashed users
+     */
+    public function trash()
+    {
+        $users = User::onlyTrashed()
+                    ->latest()
+                    ->paginate(10);
+
+        return view('users.trash', compact('users'));
+    }
+
+    /**
+     * Restore trashed user
+     */
+    public function restore($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+
+        $user->restore();
+
+        return back()->with('success', 'User restored successfully!');
+    }
+
+    /**
+     * Permanently delete user
+     */
+    public function forceDelete($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+
+        $user->forceDelete();
+
+        return back()->with('success', 'User permanently deleted!');
+    }
+
+    /**
+     * Export users CSV
+     */
     public function export()
     {
         $users = User::all();
 
+        $fileName = 'users.csv';
+
         $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="users.csv"',
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$fileName}",
         ];
 
-        $columns = ['ID', 'Name', 'Email', 'Status'];
+        $columns = [
+            'ID',
+            'Name',
+            'Email',
+            'Status',
+        ];
 
         $callback = function () use ($users, $columns) {
+
             $file = fopen('php://output', 'w');
+
+            // Header row
             fputcsv($file, $columns);
 
+            // Data rows
             foreach ($users as $user) {
+
                 fputcsv($file, [
                     $user->id,
                     $user->name,
@@ -81,28 +147,5 @@ class UserController extends Controller
         };
 
         return Response::stream($callback, 200, $headers);
-    }
-
-    // Trash users
-    public function trash()
-    {
-        $users = User::onlyTrashed()->paginate(10);
-        return view('users.trash', compact('users'));
-    }
-
-    // Restore user
-    public function restore($id)
-    {
-        $user = User::onlyTrashed()->findOrFail($id);
-        $user->restore();
-        return back()->with('success', 'User restored!');
-    }
-
-    // Permanently delete
-    public function forceDelete($id)
-    {
-        $user = User::onlyTrashed()->findOrFail($id);
-        $user->forceDelete();
-        return back()->with('success', 'User permanently deleted!');
     }
 }
