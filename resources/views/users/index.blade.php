@@ -7,7 +7,7 @@
     <title>User Management</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    
     <style>
         * {
             margin: 0;
@@ -280,14 +280,9 @@
 
             <div class="d-flex justify-content-between gap-3 mb-4 top-actions flex-wrap">
 
-                <form method="GET"
-                    action="{{ route('users.index') }}"
-                    class="d-flex gap-2 flex-grow-1">
+                <form method="GET" action="{{ route('users.index') }}" class="d-flex gap-2 flex-grow-1">
 
-                    <input type="text"
-                        name="search"
-                        class="form-control"
-                        value="{{ request('search') }}"
+                    <input type="text" name="search" class="form-control" value="{{ request('search') }}"
                         placeholder="Search by name or email...">
 
                     <button class="btn btn-custom btn-search">
@@ -298,15 +293,13 @@
 
                 <div class="d-flex gap-2 flex-wrap">
 
-                    <a href="{{ route('users.export') }}"
-                        class="btn btn-custom btn-export">
+                    <a href="{{ route('users.export') }}" class="btn btn-custom btn-export">
 
                         Export CSV
 
                     </a>
 
-                    <a href="{{ route('users.trash') }}"
-                        class="btn btn-custom btn-trash">
+                    <a href="{{ route('users.trash') }}" class="btn btn-custom btn-trash">
 
                         Trash Users
 
@@ -370,8 +363,7 @@
 
                                     <div class="d-flex justify-content-center gap-2">
 
-                                        <form method="POST"
-                                            action="{{ route('users.toggle', $user->id) }}">
+                                        <form method="POST" action="{{ route('users.toggle', $user->id) }}">
 
                                             @csrf
                                             @method('PATCH')
@@ -382,14 +374,12 @@
 
                                         </form>
 
-                                        <form method="POST"
-                                            action="{{ route('users.destroy', $user->id) }}">
+                                        <form method="POST" action="{{ route('users.destroy', $user->id) }}">
 
                                             @csrf
                                             @method('DELETE')
 
-                                            <button class="btn btn-delete"
-                                                onclick="return confirm('Delete this user?')">
+                                            <button class="btn btn-delete" onclick="return confirm('Delete this user?')">
 
                                                 Delete
 

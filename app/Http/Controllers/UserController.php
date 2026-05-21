@@ -28,7 +28,7 @@ class UserController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%");
+                    ->orWhere('email', 'LIKE', "%{$search}%");
             });
         }
 
@@ -74,8 +74,8 @@ class UserController extends Controller
     public function trash()
     {
         $users = User::onlyTrashed()
-                    ->latest()
-                    ->paginate(10);
+            ->latest()
+            ->paginate(10);
 
         return view('users.trash', compact('users'));
     }
@@ -114,7 +114,7 @@ class UserController extends Controller
         $fileName = 'users.csv';
 
         $headers = [
-            'Content-Type'        => 'text/csv',
+            'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename={$fileName}",
         ];
 
